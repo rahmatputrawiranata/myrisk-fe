@@ -65,11 +65,16 @@ const RiskOwner = (data: RiskOwnerType & {can_create: boolean}) => {
                 )}
             </Grid>
             <Grid container item xs={12}>
+                <ObjectiveForm
+                    mode="CREATE"
+                />
                 {
                     objectives.map((objective, index) => (
                         <ObjectiveForm
                             key={index}
-                            objectives={objective}
+                            mode="UPDATE"
+                            objective={objective}
+                        />
                             
                     ))
                 }

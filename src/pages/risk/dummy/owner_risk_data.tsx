@@ -10,10 +10,42 @@ export const owner_risk_data: RiskOwnerType = {
             target_date: new Date(),
             risks: [
                 {
-                    name: 'Risk 1'
+                    name: 'Risk 1',
+                    risk_indicator: {
+                        color: '#FF0000',
+                        name: 'HIGH',
+                        label: 'High',
+                        font_color: '#FFFFFF',
+                    },
+                    risk_severity: {
+                        color: '#FF0000',
+                        font_color: '#FFFFFF',
+                        name: 'HIGH',
+                        label: 'High',
+                    },
+                    treatment: 'Mitigate',
+                    treatment_percentage: 50,
+                    status: 'Finalized',
+                    status_updated_at: new Date('2021-10-10 10:10:10'),
                 },
                 {
-                    name: 'Risk 2'
+                    name: 'Risk 2',
+                    risk_indicator: {
+                        color: '#FF0000',
+                        name: 'HIGH',
+                        label: 'High',
+                        font_color: '#FFFFFF',
+                    },
+                    risk_severity: {
+                        color: '#FF0000',
+                        font_color: '#FFFFFF',
+                        name: 'HIGH',
+                        label: 'High',
+                    },
+                    treatment: 'Mitigate',
+                    treatment_percentage: 50,
+                    status: 'Finalized',
+                    status_updated_at: new Date('2021-10-10 10:10:10'),
                 }
             ]
         }

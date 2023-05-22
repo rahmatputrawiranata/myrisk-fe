@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import CardListComponent from "./components/CardListComponent";
 import {
     Box,
     Button,
     ButtonBase,
-    Container,
     FormControl,
     FormControlLabel,
-    FormLabel,
     Grid,
     Radio,
     RadioGroup,
@@ -21,17 +18,20 @@ import {
     KeyboardArrowUpRounded,
 } from "@mui/icons-material";
 import FormSelect from "../../components/FormSelect";
-import FormTextArea from "../../components/FormTextArea";
 import FormAutoComplete from "../../components/FormAutoComplete";
 import { DatePicker } from "@mui/x-date-pickers";
-import Form from "../../components/Form";
-import { ObjectiveType, RiskOwnerType } from "./type";
+import { ObjectiveType } from "./type";
+import FormDatePicker from "../../components/FormDatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import LabelComponent from "./components/LabelComponent";
 
 interface ObjectiveFormProp {
     risk_owner?: string;
     can_create?: boolean;
+    mode: 'CREATE' | 'UPDATE' | 'VIEW';
+    category?: 'OWNER' | 'SUBORDINATE' | 'NOTIFIED';
     can_edit?: boolean;
-    objectives?: ObjectiveType[];
+    objective?: ObjectiveType;
 }
 
 const RiskDetailRow = ({
@@ -134,12 +134,14 @@ const RiskDetailLayout = ({
 };
 
 export const ObjectiveForm = ({
-    risk_owner,
-    objectives = [],
-    can_create,
-    can_edit
+    mode = 'CREATE',
+    objective,
+    category = "OWNER",
 }: ObjectiveFormProp) => {
-    const [isOpen, setIsOpen] = useState<boolean>(true);
+
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [objectiveData, setObjectiveData] = useState<ObjectiveType>(objective ?? {} as ObjectiveType)
+    const [targetDate, setTargetDate] = useState<Dayjs | null>(dayjs(objectiveData.target_date))
     const riskIndicatorItems = [
         { label: "High", value: "high" },
         { label: "Medium", value: "medium" },
@@ -182,1043 +184,1262 @@ export const ObjectiveForm = ({
     const [riskIndicator, setRiskIndicator] = useState<string>("high");
     return (
         <ObjectiveWrapperComponent>
-                {
-                    can_create && (
-                        <>
-                            <Grid container item xs={10} sm={9} md={4} alignItems="center">
-                                <FormText label="Objective" value="" labelPosition="left" />
-                            </Grid>
-                            <Grid
-                                container
-                                item
-                                xs={2}
-                                sm={3}
-                                md={1}
-                                alignItems="center"
-                                justifyContent="center"
-                            >
-                                <ButtonBase onClick={() => setIsOpen(!isOpen)}>
-                                    {isOpen ? (
-                                        <KeyboardArrowUpRounded
-                                            sx={{
-                                                borderRadius: "50%",
-                                                backgroundColor: "#CCCCCC",
-                                                fontSize: "40px",
-                                                padding: 1,
-                                            }}
-                                        />
-                                    ) : (
-                                        <KeyboardArrowDownRounded
-                                            sx={{
-                                                borderRadius: "50%",
-                                                backgroundColor: "#CCCCCC",
-                                                fontSize: "40px",
-                                                padding: 1,
-                                            }}
-                                        />
-                                    )}
-                                </ButtonBase>
-                            </Grid>
-                        </>
-                    )
-                }
-                {
-                    objectives.map((objective, index) => {
 
+            {(() => {
+                switch (mode) {
+                    case 'CREATE':
                         return (
                             <>
-                                <Grid container item xs={12} sm={12} md={12} lg={12}>
-                                    <Grid container item xs={4} sx={{ paddingTop: "12px" }}>
-                                        <Grid item xs={3}>
+                                <Grid container item xs={10} sm={9} md={4} alignItems="center">
+                                    <Grid item xs={3} sx={{ paddingRight: '10px' }}>
+                                        <Typography
+                                            fontWeight="bold"
+                                            color="#000"
+                                            fontSize="14px"
+                                            textAlign="right"
+                                        >
                                             Objective :
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            {objective?.name ?? "-"}
-                                        </Grid>
+                                        </Typography>
                                     </Grid>
-                                    <Grid item xs={1} textAlign="center" alignItems="center">
-                                        <KeyboardArrowDownRounded
-                                            sx={{
-                                                borderRadius: "50%",
-                                                backgroundColor: "#CCCCCC",
-                                                fontSize: "40px",
-                                                padding: 1,
-                                            }}
+                                    <Grid item xs={6}>
+                                        <FormText
+                                            value={objectiveData?.name ?? ""}
+                                            labelPosition="none"
+                                            onChange={(val) => setObjectiveData({ ...objectiveData, name: val.target.value })}
                                         />
                                     </Grid>
-                                    <Grid container item xs={5} sx={{ paddingTop: "12px" }}>
-                                        <Grid item xs={3}>
-                                            <Typography
+
+                                </Grid>
+                                <Grid
+                                    container
+                                    item
+                                    xs={2}
+                                    sm={3}
+                                    md={1}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <ButtonBase onClick={() => setIsOpen(!isOpen)}>
+                                        {isOpen ? (
+                                            <KeyboardArrowUpRounded
                                                 sx={{
-                                                    fontWeight: "bold",
-                                                    textAlign: "center",
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#CCCCCC",
+                                                    fontSize: "40px",
+                                                    padding: 1,
                                                 }}
-                                            >
-                                                Risk Indicator
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Typography
+                                            />
+                                        ) : (
+                                            <KeyboardArrowDownRounded
                                                 sx={{
-                                                    fontWeight: "bold",
-                                                    textAlign: "center",
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#CCCCCC",
+                                                    fontSize: "40px",
+                                                    padding: 1,
                                                 }}
-                                            >
-                                                Risk Severity
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Typography
-                                                sx={{
-                                                    fontWeight: "bold",
-                                                    textAlign: "center",
-                                                }}
-                                            >
-                                                Treatment
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Typography
-                                                sx={{
-                                                    fontWeight: "bold",
-                                                    textAlign: "center",
-                                                }}
-                                            >
-                                                Status
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                    <Grid container item xs={2}></Grid>
+                                            />
+                                        )}
+                                    </ButtonBase>
                                 </Grid>
                             </>
                         )
-
-                    })
-                }
-                {isOpen ? (
-                    <Grid container item xs={12} sm={12} md={7}>
-                        <Grid item xs={6}>
-                            <FormText
-                                label="Achievement Target"
-                                value=""
-                                labelPosition="left"
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormText label="Target Date" value="" labelPosition="left" />
-                        </Grid>
-                    </Grid>
-                ) : (
-                    <>
-                        <Grid container item xs={12} sm={12} md={5}>
-                            <Grid item xs={3}>
-                                <Typography
-                                    sx={{
-                                        fontWeight: "bold",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Risk Indicator
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Typography
-                                    sx={{
-                                        fontWeight: "bold",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Risk Severity
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Typography
-                                    sx={{
-                                        fontWeight: "bold",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Treatment
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Typography
-                                    sx={{
-                                        fontWeight: "bold",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Status
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid container item xs={12} sm={12} md={2}></Grid>
-                    </>
-                )}
-                {isOpen && (
-                    <Grid
-                        item
-                        xs={12}
-                        sx={{
-                            border: "1px solid #cacaca",
-                            borderRadius: "5px",
-                            padding: "10px",
-                            marginY: "10px",
-                        }}
-                    >
-                        <Grid container marginY={1}>
-                            <Grid container item xs={8} paddingRight="10px">
-                                <Grid container item xs={12} sx={{ paddingBottom: "10px" }}>
-                                    <Grid item xs={8} paddingRight="10px">
-                                        <FormText label="Risk" value="" labelPosition="left" />
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <FormSelect
-                                            label="+/-"
-                                            value={riskIndicator}
-                                            labelPosition="left"
-                                            items={riskIndicatorItems}
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Grid container item xs={12}>
-                                    <Grid item xs={8} paddingRight="10px">
-                                        <FormText
-                                            label="Financial Exposure"
-                                            value=""
-                                            labelPosition="left"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <FormSelect
-                                            label="Category"
-                                            value=""
-                                            labelPosition="left"
-                                            items={[
-                                                {
-                                                    label: "Category 1",
-                                                    value: "category_1",
-                                                },
-                                                {
-                                                    label: "Category 2",
-                                                    value: "category_2",
-                                                },
-                                            ]}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                            <Grid
-                                container
-                                item
-                                xs={3}
-                                sx={{
-                                    alignContent: "flex-start",
-                                }}
-                            >
-                                <FormAutoComplete
-                                    label="Risk Owner"
-                                    value=""
-                                    labelPosition="left"
-                                    items={hashTags}
-                                />
-                            </Grid>
-                            <Grid
-                                container
-                                item
-                                xs={1}
-                                alignItems="flex-start"
-                                justifyContent="flex-end"
-                            >
-                                {false && (
-                                    <ButtonBase>
-                                        <Delete fontSize="large" />
-                                    </ButtonBase>
-                                )}
-                            </Grid>
-                        </Grid>
-                        <RiskDetailLayout>
-                            {/* Perceived Cause Section */}
+                    default:
+                        return (
                             <>
-                                {/* Header */}
-                                <RiskDetailRow
-                                    component={
-                                        <>
-                                            <Grid container alignItems="center">
-                                                <Grid item xs={5}>
+                                <Grid container item xs={10} sm={9} md={4} alignItems="center">
+                                    {
+                                        isOpen ? (
+                                            <>
+                                                <Grid item xs={3} sx={{ paddingRight: '10px' }}>
                                                     <Typography
                                                         fontWeight="bold"
                                                         color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
+                                                        fontSize="14px"
+                                                        textAlign="right"
                                                     >
-                                                        Perceived Cause (PIC)
+                                                        Objective :
                                                     </Typography>
                                                 </Grid>
-                                                <Grid item xs={3}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Notify To
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Indicator
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Justification
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </>
-                                    }
-                                    q1="Q1"
-                                    q2="Q2"
-                                    q3="Q3"
-                                    q4="Q4"
-                                    sxQ1={{
-                                        borderBottom: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ2={{
-                                        borderBottom: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ3={{
-                                        borderBottom: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ4={{
-                                        borderBottom: "1px solid #CCCCCC",
-                                    }}
-                                />
-                                {/* Body Data */}
-                                <RiskDetailRow
-                                    component={
-                                        <>
-                                            <Grid
-                                                container
-                                                alignItems="center"
-                                                sx={{ padding: "10px" }}
-                                            >
-                                                <Grid
-                                                    item
-                                                    xs={5}
-                                                    sx={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        paddingRight: "10px",
-                                                    }}
-                                                >
-                                                    <FormText labelPosition="none" />
-                                                    <Box
-                                                        sx={{
-                                                            padding: "2px",
-                                                            paddingLeft: "15px",
-                                                        }}
-                                                    >
-                                                        {false && (
-                                                            <ButtonBase>
-                                                                <Delete
-                                                                    sx={{
-                                                                        color: "#FF0000",
-                                                                    }}
-                                                                />
-                                                            </ButtonBase>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                                <Grid item xs={3} sx={{ paddingRight: "10px" }}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        <FormAutoComplete
-                                                            value=""
-                                                            labelPosition="none"
-                                                            items={subordinates}
-                                                        />
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={2} sx={{ paddingRight: "10px" }}>
-                                                    <FormSelect
-                                                        items={[
-                                                            {
-                                                                value: "danger",
-                                                                label: "Danger",
-                                                            },
-                                                            {
-                                                                value: "neutral",
-                                                                label: "Neutral",
-                                                            },
-                                                            {
-                                                                value: "safe",
-                                                                label: "Safe",
-                                                            },
-                                                        ]}
+                                                <Grid item xs={6}>
+                                                    <FormText
+                                                        value={objectiveData?.name ?? ""}
+                                                        labelPosition="none"
+                                                        onChange={(val) => setObjectiveData({ ...objectiveData, name: val.target.value })}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    <FormText />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Grid item xs={3} sx={{ paddingRight: '10px' }}>
+                                                    <Typography
+                                                        fontWeight="bold"
+                                                        color="#000"
+                                                        fontSize="14px"
+                                                        textAlign="right"
+                                                    >
+                                                        Objective :
+                                                    </Typography>
                                                 </Grid>
-                                            </Grid>
-                                        </>
+                                                <Grid item xs={6}>
+                                                    <Typography
+                                                        fontWeight="bold"
+                                                        color="#000"
+                                                        fontSize="14px"
+                                                        textAlign="left"
+                                                    >
+                                                        {objectiveData?.name ?? "-"}
+                                                    </Typography>
+                                                </Grid>
+                                            </>
+                                        )
                                     }
-                                    q1={
-                                        <Box
-                                            sx={{
-                                                borderRadius: "100px",
-                                                backgroundColor: "red",
-                                                width: "20px",
-                                                height: "20px",
-                                            }}
-                                        />
-                                    }
-                                    q2=""
-                                    q3=""
-                                    q4=""
-                                />
+                                </Grid>
+                                <Grid
+                                    container
+                                    item
+                                    xs={2}
+                                    sm={3}
+                                    md={1}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <ButtonBase onClick={() => setIsOpen(!isOpen)}>
+                                        {isOpen ? (
+                                            <KeyboardArrowUpRounded
+                                                sx={{
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#CCCCCC",
+                                                    fontSize: "40px",
+                                                    padding: 1,
+                                                }}
+                                            />
+                                        ) : (
+                                            <KeyboardArrowDownRounded
+                                                sx={{
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#CCCCCC",
+                                                    fontSize: "40px",
+                                                    padding: 1,
+                                                }}
+                                            />
+                                        )}
+                                    </ButtonBase>
+                                </Grid>
                             </>
-                            {/* Inherent RIsk Score */}
-                            <>
-                                <RiskDetailRow
-                                    sxComponent={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    component={
-                                        <Grid container sx={{ padding: "10px" }}>
-                                            <Grid container item xs={12}>
-                                                <Grid item xs={8}></Grid>
-                                                <Grid container item xs={4}>
-                                                    <Grid item xs={4}>
-                                                        <Typography
-                                                            fontWeight="bold"
-                                                            color="#000"
-                                                            fontSize="12px"
-                                                            textAlign="center"
-                                                        >
-                                                            Likelihood
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <Typography
-                                                            fontWeight="bold"
-                                                            color="#000"
-                                                            fontSize="12px"
-                                                            textAlign="center"
-                                                        >
-                                                            Impact
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <Typography
-                                                            fontWeight="bold"
-                                                            color="#000"
-                                                            fontSize="12px"
-                                                            textAlign="center"
-                                                        >
-                                                            Severity
-                                                        </Typography>
-                                                    </Grid>
-                                                </Grid>
+                        )
+                }
+            })()}
+            {isOpen ? (
+                <Grid container item xs={12} sm={12} md={7}>
+                    <Grid item xs={5}>
+                        <FormText
+                            label="Achievement Target"
+                            value={objectiveData.achievement_target}
+                            onChange={(val) => setObjectiveData({ ...objectiveData, achievement_target: val.target.value })}
+                            labelPosition="left"
+                        />
+                    </Grid>
+                    <Grid item xs={5} sx={{ paddingLeft: '10px' }}>
+                        <FormDatePicker
+                            value={objectiveData.target_date ? dayjs(objectiveData.target_date) : null}
+                            labelPosition="left"
+                            label="Target Date"
+                            onChange={(val) => setObjectiveData({ ...objectiveData, target_date: val?.toDate() ?? null })}
+                        />
+                    </Grid>
+                    {
+                        mode !== 'CREATE' && (
+                            <Grid item xs={2} sx={{ paddingLeft: '10px' }}>
+                                <ButtonBase>
+                                    <Delete />
+                                </ButtonBase>
+                            </Grid>
+                        )
+                    }
+                </Grid>
+            ) : (
+                <>
+                    <Grid container item xs={12} sm={12} md={5}>
+                        <Grid item xs={3}>
+                            <Typography
+                                sx={{
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                Risk Indicator
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography
+                                sx={{
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                Risk Severity
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography
+                                sx={{
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                Treatment
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography
+                                sx={{
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                Status
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Grid container item xs={12} sm={12} md={2}>
+                        {/*  */}
+                    </Grid>
+                </>
+            )}
+            {/* Form */}
+            {isOpen && (
+                <Grid
+                    item
+                    xs={12}
+                    sx={{
+                        border: "1px solid #cacaca",
+                        borderRadius: "5px",
+                        padding: "10px",
+                        marginY: "10px",
+                    }}
+                >
+                    <Grid container marginY={1}>
+                        <Grid container item xs={8} paddingRight="10px">
+                            <Grid container item xs={12} sx={{ paddingBottom: "10px" }}>
+                                <Grid item xs={8} paddingRight="10px">
+                                    <FormText label="Risk" value="" labelPosition="left" />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <FormSelect
+                                        label="+/-"
+                                        value={riskIndicator}
+                                        labelPosition="left"
+                                        items={riskIndicatorItems}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid container item xs={12}>
+                                <Grid item xs={8} paddingRight="10px">
+                                    <FormText
+                                        label="Financial Exposure"
+                                        value=""
+                                        labelPosition="left"
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <FormSelect
+                                        label="Category"
+                                        value=""
+                                        labelPosition="left"
+                                        items={[
+                                            {
+                                                label: "Category 1",
+                                                value: "category_1",
+                                            },
+                                            {
+                                                label: "Category 2",
+                                                value: "category_2",
+                                            },
+                                        ]}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            item
+                            xs={3}
+                            sx={{
+                                alignContent: "flex-start",
+                            }}
+                        >
+                            <FormAutoComplete
+                                label="Risk Owner"
+                                value=""
+                                labelPosition="left"
+                                items={hashTags}
+                            />
+                        </Grid>
+                        <Grid
+                            container
+                            item
+                            xs={1}
+                            alignItems="flex-start"
+                            justifyContent="flex-end"
+                        >
+                            {false && (
+                                <ButtonBase>
+                                    <Delete fontSize="large" />
+                                </ButtonBase>
+                            )}
+                        </Grid>
+                    </Grid>
+                    <RiskDetailLayout>
+                        {/* Perceived Cause Section */}
+                        <>
+                            {/* Header */}
+                            <RiskDetailRow
+                                component={
+                                    <>
+                                        <Grid container alignItems="center">
+                                            <Grid item xs={5}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Perceived Cause (PIC)
+                                                </Typography>
                                             </Grid>
-                                            <Grid container item xs={12}>
-                                                <Grid
-                                                    item
-                                                    xs={8}
+                                            <Grid item xs={3}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Notify To
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Indicator
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Justification
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                                q1="Q1"
+                                q2="Q2"
+                                q3="Q3"
+                                q4="Q4"
+                                sxQ1={{
+                                    borderBottom: "1px solid #CCCCCC",
+                                }}
+                                sxQ2={{
+                                    borderBottom: "1px solid #CCCCCC",
+                                }}
+                                sxQ3={{
+                                    borderBottom: "1px solid #CCCCCC",
+                                }}
+                                sxQ4={{
+                                    borderBottom: "1px solid #CCCCCC",
+                                }}
+                            />
+                            {/* Body Data */}
+                            <RiskDetailRow
+                                component={
+                                    <>
+                                        <Grid
+                                            container
+                                            alignItems="center"
+                                            sx={{ padding: "10px" }}
+                                        >
+                                            <Grid
+                                                item
+                                                xs={5}
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    paddingRight: "10px",
+                                                }}
+                                            >
+                                                <FormText labelPosition="none" />
+                                                <Box
                                                     sx={{
-                                                        paddingRight: "10px",
-                                                        alignItems: "center",
-                                                        display: "flex",
-                                                        justifyContent: "flex-end",
+                                                        padding: "2px",
+                                                        paddingLeft: "15px",
                                                     }}
                                                 >
+                                                    {false && (
+                                                        <ButtonBase>
+                                                            <Delete
+                                                                sx={{
+                                                                    color: "#FF0000",
+                                                                }}
+                                                            />
+                                                        </ButtonBase>
+                                                    )}
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3} sx={{ paddingRight: "10px" }}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    <FormAutoComplete
+                                                        value=""
+                                                        labelPosition="none"
+                                                        items={subordinates}
+                                                    />
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={2} sx={{ paddingRight: "10px" }}>
+                                                <FormSelect
+                                                    items={[
+                                                        {
+                                                            value: "danger",
+                                                            label: "Danger",
+                                                        },
+                                                        {
+                                                            value: "neutral",
+                                                            label: "Neutral",
+                                                        },
+                                                        {
+                                                            value: "safe",
+                                                            label: "Safe",
+                                                        },
+                                                    ]}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <FormText />
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                                q1={
+                                    <Box
+                                        sx={{
+                                            borderRadius: "100px",
+                                            backgroundColor: "red",
+                                            width: "20px",
+                                            height: "20px",
+                                        }}
+                                    />
+                                }
+                                q2=""
+                                q3=""
+                                q4=""
+                            />
+                        </>
+                        {/* Inherent RIsk Score */}
+                        <>
+                            <RiskDetailRow
+                                sxComponent={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                component={
+                                    <Grid container sx={{ padding: "10px" }}>
+                                        <Grid container item xs={12}>
+                                            <Grid item xs={8}></Grid>
+                                            <Grid container item xs={4}>
+                                                <Grid item xs={4}>
                                                     <Typography
                                                         fontWeight="bold"
                                                         color="#000"
                                                         fontSize="12px"
+                                                        textAlign="center"
                                                     >
-                                                        Inherent Risk Score :
+                                                        Likelihood
                                                     </Typography>
                                                 </Grid>
-                                                <Grid container item xs={4}>
-                                                    <Grid item xs={4} sx={{ paddingRight: "10px" }}>
-                                                        <FormText />
-                                                    </Grid>
-                                                    <Grid item xs={4} sx={{ paddingRight: "10px" }}>
-                                                        <FormText />
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <FormText />
-                                                    </Grid>
+                                                <Grid item xs={4}>
+                                                    <Typography
+                                                        fontWeight="bold"
+                                                        color="#000"
+                                                        fontSize="12px"
+                                                        textAlign="center"
+                                                    >
+                                                        Impact
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <Typography
+                                                        fontWeight="bold"
+                                                        color="#000"
+                                                        fontSize="12px"
+                                                        textAlign="center"
+                                                    >
+                                                        Severity
+                                                    </Typography>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
-                                    }
-                                />
-                            </>
-                            {/* End Inherent Risk Score Section */}
-                            {/* Existing Mitigation Section */}
-                            <>
-                                {/* Header */}
-                                <RiskDetailRow
-                                    sxComponent={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    component={
-                                        <>
-                                            <Grid container alignItems="center">
-                                                <Grid item xs={5}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Existing Mitigation
-                                                    </Typography>
+                                        <Grid container item xs={12}>
+                                            <Grid
+                                                item
+                                                xs={8}
+                                                sx={{
+                                                    paddingRight: "10px",
+                                                    alignItems: "center",
+                                                    display: "flex",
+                                                    justifyContent: "flex-end",
+                                                }}
+                                            >
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                >
+                                                    Inherent Risk Score :
+                                                </Typography>
+                                            </Grid>
+                                            <Grid container item xs={4}>
+                                                <Grid item xs={4} sx={{ paddingRight: "10px" }}>
+                                                    <FormText />
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Related PC
-                                                    </Typography>
+                                                <Grid item xs={4} sx={{ paddingRight: "10px" }}>
+                                                    <FormText />
                                                 </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Preventive
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Corrective
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Effectiveness
-                                                    </Typography>
+                                                <Grid item xs={4}>
+                                                    <FormText />
                                                 </Grid>
                                             </Grid>
-                                        </>
-                                    }
-                                    sxQ1={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ2={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ3={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ4={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                />
-                                {/* Body Data */}
-                                <RiskDetailRow
-                                    component={
-                                        <>
+                                        </Grid>
+                                    </Grid>
+                                }
+                            />
+                        </>
+                        {/* End Inherent Risk Score Section */}
+                        {/* Existing Mitigation Section */}
+                        <>
+                            {/* Header */}
+                            <RiskDetailRow
+                                sxComponent={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                component={
+                                    <>
+                                        <Grid container alignItems="center">
+                                            <Grid item xs={5}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Existing Mitigation
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Related PC
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Preventive
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Corrective
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Effectiveness
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                                sxQ1={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ2={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ3={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ4={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                            />
+                            {/* Body Data */}
+                            <RiskDetailRow
+                                component={
+                                    <>
+                                        <Grid
+                                            container
+                                            alignItems="center"
+                                            sx={{ padding: "10px" }}
+                                        >
                                             <Grid
-                                                container
-                                                alignItems="center"
-                                                sx={{ padding: "10px" }}
+                                                item
+                                                xs={5}
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    paddingRight: "10px",
+                                                }}
                                             >
-                                                <Grid
-                                                    item
-                                                    xs={5}
+                                                <FormText labelPosition="none" />
+                                                <Box
                                                     sx={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        paddingRight: "10px",
+                                                        padding: "2px",
+                                                        paddingLeft: "15px",
                                                     }}
                                                 >
-                                                    <FormText labelPosition="none" />
-                                                    <Box
-                                                        sx={{
-                                                            padding: "2px",
-                                                            paddingLeft: "15px",
-                                                        }}
-                                                    >
-                                                        {false && (
-                                                            <ButtonBase>
-                                                                <Delete
-                                                                    sx={{
-                                                                        color: "#FF0000",
-                                                                    }}
-                                                                />
-                                                            </ButtonBase>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                                <Grid item xs={2} sx={{ paddingRight: "10px" }}>
-                                                    <FormText value="" labelPosition="none" />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <FormSelect
-                                                        items={[
-                                                            {
-                                                                value: true,
-                                                                label: "YES",
-                                                            },
-                                                            {
-                                                                value: false,
-                                                                label: "NO",
-                                                            },
-                                                        ]}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <FormSelect
-                                                        items={[
-                                                            {
-                                                                value: true,
-                                                                label: "YES",
-                                                            },
-                                                            {
-                                                                value: false,
-                                                                label: "NO",
-                                                            },
-                                                        ]}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={3} sx={{ paddingRight: "10px" }}>
-                                                    <FormText value="" labelPosition="none" />
-                                                </Grid>
-                                            </Grid>
-                                        </>
-                                    }
-                                />
-                            </>
-                            {/* End Existing Mitigation Section */}
-                            {/* Start Of Teatment Section */}
-                            <>
-                                <RiskDetailRow
-                                    sxComponent={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    component={
-                                        <>
-                                            <Grid
-                                                container
-                                                alignItems="center"
-                                                justifyContent="right"
-                                            >
-                                                <Grid container item xs={8} justifyContent="flex-end">
-                                                    <Grid item>
-                                                        <Box>
-                                                            Select Treatment :
-                                                            <Box
+                                                    {false && (
+                                                        <ButtonBase>
+                                                            <Delete
                                                                 sx={{
-                                                                    display: "inline-block",
+                                                                    color: "#FF0000",
                                                                 }}
-                                                            >
-                                                                <FormControl>
-                                                                    <RadioGroup row name="treatment">
-                                                                        <FormControlLabel
-                                                                            value="mitigate"
-                                                                            label="Mitigate"
-                                                                            control={<Radio />}
-                                                                        />
-                                                                        <FormControlLabel
-                                                                            value="transfer"
-                                                                            label="Transfer"
-                                                                            control={<Radio />}
-                                                                        />
-                                                                        <FormControlLabel
-                                                                            value="accept"
-                                                                            label="Accept"
-                                                                            control={<Radio />}
-                                                                        />
-                                                                        <FormControlLabel
-                                                                            value="avoid"
-                                                                            label="Avoid"
-                                                                            control={<Radio />}
-                                                                        />
-                                                                    </RadioGroup>
-                                                                </FormControl>
-                                                            </Box>
+                                                            />
+                                                        </ButtonBase>
+                                                    )}
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={2} sx={{ paddingRight: "10px" }}>
+                                                <FormText value="" labelPosition="none" />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <FormSelect
+                                                    items={[
+                                                        {
+                                                            value: true,
+                                                            label: "YES",
+                                                        },
+                                                        {
+                                                            value: false,
+                                                            label: "NO",
+                                                        },
+                                                    ]}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <FormSelect
+                                                    items={[
+                                                        {
+                                                            value: true,
+                                                            label: "YES",
+                                                        },
+                                                        {
+                                                            value: false,
+                                                            label: "NO",
+                                                        },
+                                                    ]}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={3} sx={{ paddingRight: "10px" }}>
+                                                <FormText value="" labelPosition="none" />
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                            />
+                        </>
+                        {/* End Existing Mitigation Section */}
+                        {/* Start Of Teatment Section */}
+                        <>
+                            <RiskDetailRow
+                                sxComponent={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                component={
+                                    <>
+                                        <Grid
+                                            container
+                                            alignItems="center"
+                                            justifyContent="right"
+                                        >
+                                            <Grid container item xs={8} justifyContent="flex-end">
+                                                <Grid item>
+                                                    <Box>
+                                                        Select Treatment :
+                                                        <Box
+                                                            sx={{
+                                                                display: "inline-block",
+                                                            }}
+                                                        >
+                                                            <FormControl>
+                                                                <RadioGroup row name="treatment">
+                                                                    <FormControlLabel
+                                                                        value="mitigate"
+                                                                        label="Mitigate"
+                                                                        control={<Radio />}
+                                                                    />
+                                                                    <FormControlLabel
+                                                                        value="transfer"
+                                                                        label="Transfer"
+                                                                        control={<Radio />}
+                                                                    />
+                                                                    <FormControlLabel
+                                                                        value="accept"
+                                                                        label="Accept"
+                                                                        control={<Radio />}
+                                                                    />
+                                                                    <FormControlLabel
+                                                                        value="avoid"
+                                                                        label="Avoid"
+                                                                        control={<Radio />}
+                                                                    />
+                                                                </RadioGroup>
+                                                            </FormControl>
                                                         </Box>
-                                                        <Box>
-                                                            <Grid container>
-                                                                {/* Header */}
-                                                                <Grid container item>
-                                                                    <Grid item xs={3}></Grid>
-                                                                    <Grid item xs={3}>
-                                                                        <Typography
-                                                                            fontWeight="bold"
-                                                                            color="#000"
-                                                                            fontSize="12px"
-                                                                            textAlign="center"
-                                                                        >
-                                                                            Likelihood
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid item xs={3}>
-                                                                        <Typography
-                                                                            fontWeight="bold"
-                                                                            color="#000"
-                                                                            fontSize="12px"
-                                                                            textAlign="center"
-                                                                        >
-                                                                            Impact
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid item xs={3}>
-                                                                        <Typography
-                                                                            fontWeight="bold"
-                                                                            color="#000"
-                                                                            fontSize="12px"
-                                                                            textAlign="center"
-                                                                        >
-                                                                            Severity
-                                                                        </Typography>
-                                                                    </Grid>
+                                                    </Box>
+                                                    <Box>
+                                                        <Grid container>
+                                                            {/* Header */}
+                                                            <Grid container item>
+                                                                <Grid item xs={3}></Grid>
+                                                                <Grid item xs={3}>
+                                                                    <Typography
+                                                                        fontWeight="bold"
+                                                                        color="#000"
+                                                                        fontSize="12px"
+                                                                        textAlign="center"
+                                                                    >
+                                                                        Likelihood
+                                                                    </Typography>
                                                                 </Grid>
-                                                                <Grid
-                                                                    container
-                                                                    item
-                                                                    alignItems="center"
-                                                                    sx={{ paddingY: "10px" }}
-                                                                >
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
+                                                                <Grid item xs={3}>
+                                                                    <Typography
+                                                                        fontWeight="bold"
+                                                                        color="#000"
+                                                                        fontSize="12px"
+                                                                        textAlign="center"
                                                                     >
-                                                                        <Typography
-                                                                            fontWeight="bold"
-                                                                            color="#000"
-                                                                            fontSize="12px"
-                                                                            textAlign="right"
-                                                                        >
-                                                                            Target Risk Score :
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
+                                                                        Impact
+                                                                    </Typography>
                                                                 </Grid>
-                                                                <Grid
-                                                                    container
-                                                                    item
-                                                                    alignItems="center"
-                                                                    sx={{ paddingY: "10px" }}
-                                                                >
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
+                                                                <Grid item xs={3}>
+                                                                    <Typography
+                                                                        fontWeight="bold"
+                                                                        color="#000"
+                                                                        fontSize="12px"
+                                                                        textAlign="center"
                                                                     >
-                                                                        <Typography
-                                                                            fontWeight="bold"
-                                                                            color="#000"
-                                                                            fontSize="12px"
-                                                                            textAlign="right"
-                                                                        >
-                                                                            Current Risk Score :
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={3}
-                                                                        sx={{ paddingRight: "10px" }}
-                                                                    >
-                                                                        <FormText />
-                                                                    </Grid>
+                                                                        Severity
+                                                                    </Typography>
                                                                 </Grid>
                                                             </Grid>
-                                                        </Box>
-                                                    </Grid>
+                                                            <Grid
+                                                                container
+                                                                item
+                                                                alignItems="center"
+                                                                sx={{ paddingY: "10px" }}
+                                                            >
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <Typography
+                                                                        fontWeight="bold"
+                                                                        color="#000"
+                                                                        fontSize="12px"
+                                                                        textAlign="right"
+                                                                    >
+                                                                        Target Risk Score :
+                                                                    </Typography>
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid
+                                                                container
+                                                                item
+                                                                alignItems="center"
+                                                                sx={{ paddingY: "10px" }}
+                                                            >
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <Typography
+                                                                        fontWeight="bold"
+                                                                        color="#000"
+                                                                        fontSize="12px"
+                                                                        textAlign="right"
+                                                                    >
+                                                                        Current Risk Score :
+                                                                    </Typography>
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                                <Grid
+                                                                    item
+                                                                    xs={3}
+                                                                    sx={{ paddingRight: "10px" }}
+                                                                >
+                                                                    <FormText />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Box>
                                                 </Grid>
                                             </Grid>
-                                        </>
-                                    }
-                                />
-                            </>
-                            {/* End Of Treatment Section */}
-                            {/* Mitigation Plan Section */}
-                            <>
-                                {/* Header */}
-                                <RiskDetailRow
-                                    sxComponent={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    component={
-                                        <>
-                                            <Grid container alignItems="center">
-                                                <Grid item xs={3}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Mitigation Plan
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Cost (IDR)
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        PIC
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Related PC
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Preventive
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Corrective
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Target Date
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Typography
-                                                        fontWeight="bold"
-                                                        color="#000"
-                                                        fontSize="12px"
-                                                        textAlign="center"
-                                                    >
-                                                        Progress
-                                                    </Typography>
-                                                </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                            />
+                        </>
+                        {/* End Of Treatment Section */}
+                        {/* Mitigation Plan Section */}
+                        <>
+                            {/* Header */}
+                            <RiskDetailRow
+                                sxComponent={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                component={
+                                    <>
+                                        <Grid container alignItems="center">
+                                            <Grid item xs={3}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Mitigation Plan
+                                                </Typography>
                                             </Grid>
-                                        </>
-                                    }
-                                    sxQ1={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ2={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ3={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                    sxQ4={{
-                                        borderTop: "1px solid #CCCCCC",
-                                    }}
-                                />
-                                {/* Body Data */}
-                                <RiskDetailRow
-                                    component={
-                                        <>
+                                            <Grid item xs={2}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Cost (IDR)
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    PIC
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Related PC
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Preventive
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Corrective
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Target Date
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Typography
+                                                    fontWeight="bold"
+                                                    color="#000"
+                                                    fontSize="12px"
+                                                    textAlign="center"
+                                                >
+                                                    Progress
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                                sxQ1={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ2={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ3={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                                sxQ4={{
+                                    borderTop: "1px solid #CCCCCC",
+                                }}
+                            />
+                            {/* Body Data */}
+                            <RiskDetailRow
+                                component={
+                                    <>
+                                        <Grid
+                                            container
+                                            alignItems="center"
+                                            sx={{ padding: "10px" }}
+                                        >
                                             <Grid
-                                                container
-                                                alignItems="center"
-                                                sx={{ padding: "10px" }}
+                                                item
+                                                xs={3}
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    paddingRight: "10px",
+                                                }}
                                             >
-                                                <Grid
-                                                    item
-                                                    xs={3}
+                                                <FormText labelPosition="none" />
+                                                <Box
                                                     sx={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        paddingRight: "10px",
+                                                        padding: "2px",
+                                                        paddingLeft: "15px",
                                                     }}
                                                 >
-                                                    <FormText labelPosition="none" />
-                                                    <Box
-                                                        sx={{
-                                                            padding: "2px",
-                                                            paddingLeft: "15px",
-                                                        }}
-                                                    >
-                                                        {false && (
-                                                            <ButtonBase>
-                                                                <Delete
-                                                                    sx={{
-                                                                        color: "#FF0000",
-                                                                    }}
-                                                                />
-                                                            </ButtonBase>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                                <Grid item xs={2} sx={{ paddingRight: "10px" }}>
-                                                    <FormText value="" labelPosition="none" />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <FormText value="" labelPosition="none" />
-                                                </Grid>
-                                                <Grid item xs={2} sx={{ paddingRight: "10px" }}>
-                                                    <FormText value="" labelPosition="none" />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <FormSelect
-                                                        items={[
-                                                            {
-                                                                value: true,
-                                                                label: "YES",
-                                                            },
-                                                            {
-                                                                value: false,
-                                                                label: "NO",
-                                                            },
-                                                        ]}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <FormSelect
-                                                        items={[
-                                                            {
-                                                                value: true,
-                                                                label: "YES",
-                                                            },
-                                                            {
-                                                                value: false,
-                                                                label: "NO",
-                                                            },
-                                                        ]}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={1} sx={{ paddingRight: "10px" }}>
-                                                    <DatePicker
-                                                        slotProps={{
-                                                            textField: { size: "small" },
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <Box
-                                                        display="flex"
-                                                        flexDirection="row"
-                                                        alignItems="center"
-                                                    >
-                                                        <FormText
-                                                            sx={{
-                                                                paddingRight: "5px",
-                                                            }}
-                                                        />
-                                                        %
-                                                    </Box>
-                                                </Grid>
+                                                    {false && (
+                                                        <ButtonBase>
+                                                            <Delete
+                                                                sx={{
+                                                                    color: "#FF0000",
+                                                                }}
+                                                            />
+                                                        </ButtonBase>
+                                                    )}
+                                                </Box>
                                             </Grid>
-                                        </>
-                                    }
-                                    q1=""
-                                    q2=""
-                                    q3=""
-                                    q4=""
-                                />
-                            </>
-                            {/* End Mitigation Plan Section */}
-                        </RiskDetailLayout>
-                    </Grid>
-                )}
-            </ObjectiveWrapperComponent>
+                                            <Grid item xs={2} sx={{ paddingRight: "10px" }}>
+                                                <FormText value="" labelPosition="none" />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <FormText value="" labelPosition="none" />
+                                            </Grid>
+                                            <Grid item xs={2} sx={{ paddingRight: "10px" }}>
+                                                <FormText value="" labelPosition="none" />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <FormSelect
+                                                    items={[
+                                                        {
+                                                            value: true,
+                                                            label: "YES",
+                                                        },
+                                                        {
+                                                            value: false,
+                                                            label: "NO",
+                                                        },
+                                                    ]}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <FormSelect
+                                                    items={[
+                                                        {
+                                                            value: true,
+                                                            label: "YES",
+                                                        },
+                                                        {
+                                                            value: false,
+                                                            label: "NO",
+                                                        },
+                                                    ]}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={1} sx={{ paddingRight: "10px" }}>
+                                                <DatePicker
+                                                    slotProps={{
+                                                        textField: { size: "small" },
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <Box
+                                                    display="flex"
+                                                    flexDirection="row"
+                                                    alignItems="center"
+                                                >
+                                                    <FormText
+                                                        sx={{
+                                                            paddingRight: "5px",
+                                                        }}
+                                                    />
+                                                    %
+                                                </Box>
+                                            </Grid>
+                                        </Grid>
+                                    </>
+                                }
+                                q1=""
+                                q2=""
+                                q3=""
+                                q4=""
+                            />
+                        </>
+                        {/* End Mitigation Plan Section */}
+                    </RiskDetailLayout>
+                </Grid>
+            )}
+
+            {
+                !isOpen && (
+                    objectiveData?.risks?.map((risk, index) => {
+                        return (
+                            <Grid key={index} container item xs={12} sm={12} md={12} lg={12} sx={{ paddingTop: '12px' }}>
+                                <Grid container item xs={4}>
+                                    <Grid item xs={3} sx={{paddingRight: '10px'}}>
+                                    <Typography
+                                            fontWeight="bold"
+                                            color="#000"
+                                            fontSize="14px"
+                                            textAlign="right"
+                                        >
+                                            Risk :
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {risk.name}
+                                    </Grid>
+                                    <Grid item xs={3}
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyItems: 'flex-end',
+                                        }}
+                                    >
+                                        <ButtonBase
+                                            sx={{
+                                                borderRadius: '100px',
+                                                paddingY: '5px',
+                                                paddingX: '10px',
+                                                borderWidth: '2px',
+                                                borderStyle: 'solid',
+                                                borderColor: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                color: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >COPY</ButtonBase>
+                                        <ButtonBase
+                                            sx={{
+                                                borderRadius: '100px',
+                                                paddingY: '5px',
+                                                paddingX: '10px',
+                                                borderWidth: '2px',
+                                                borderStyle: 'solid',
+                                                borderColor: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                color: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                fontWeight: 'bold',
+                                                marginTop: '5px'
+                                            }}
+                                        >MIGRATE</ButtonBase>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={1} textAlign="center" alignItems="center">
+                                    -Risk
+                                </Grid>
+                                <Grid container item xs={5}>
+                                    <Grid item xs={3}>
+                                        <LabelComponent
+                                            color={risk.risk_indicator.color}
+                                            filled={false}
+                                            font_color={risk.risk_indicator.font_color}
+                                        >
+                                            {risk.risk_indicator.label}
+                                        </LabelComponent>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <LabelComponent
+                                            color={risk.risk_severity.color}
+                                            filled={true}
+                                            font_color={risk.risk_severity.font_color}
+                                        >
+                                            {risk.risk_severity.label}
+                                        </LabelComponent>
+                                    </Grid>
+                                    <Grid item xs={3} justifyContent='center'>
+                                        <Typography
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            {risk.treatment}
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontSize: '12px',
+                                                fontWeight: 'bold',
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            {risk.treatment_percentage}%
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <Typography
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            {risk.status}
+                                        </Typography>
+                                        {
+                                            risk.status_updated_at && (
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: '12px',
+                                                        fontWeight: 'bold',
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    {dayjs(risk.status_updated_at).format('DD MMM YYYY')}
+                                                </Typography>
+                                            )
+                                        }
+                                    </Grid>
+                                </Grid>
+                                <Grid container item xs={2}>
+                                    <Grid container>
+                                        <Grid item xs={5}>
+                                            <Button
+                                                variant="outlined"
+                                                sx={{
+                                                    borderRadius: '100px',
+                                                    maxHeight: '30px',
+                                                    width: '100%',
+                                                    color: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                    borderColor: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                }}
+                                            >Approve</Button>
+                                        </Grid>
+                                        <Grid item xs={2} />
+                                        <Grid item xs={5}>
+                                            <Button
+                                                sx={{
+                                                    borderRadius: '100px',
+                                                    maxHeight: '30px',
+                                                    width: '100%',
+                                                    color: category === 'OWNER' ? '#000000' : '#FFFFFF'
+                                                }}
+                                            >Reject</Button>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container sx={{ paddingTop: '5px' }}>
+                                        <Grid item xs={12}>
+                                            <Button
+                                                variant="outlined"
+                                                sx={{
+                                                    borderRadius: '100px',
+                                                    maxHeight: '30px',
+                                                    width: '100%',
+                                                    color: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                    borderColor: category === 'OWNER' ? '#000000' : '#FFFFFF',
+                                                }}
+                                            >Unapprove</Button>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        )
+                    })
+                )
+            }
+        </ObjectiveWrapperComponent>
     );
 };

@@ -1,11 +1,31 @@
 export type RiskType = {
     name: string;
+    risk_indicator: RiskIndicatorType;
+    risk_severity: RiskSeverityType;
+    treatment: string;
+    treatment_percentage: number;
+    status: string;
+    status_updated_at: Date | null;
+}
+
+export type RiskIndicatorType = {
+    color: string;
+    font_color: string;
+    name: string;
+    label: string;
+}
+
+export type RiskSeverityType = {
+    color: string;
+    font_color: string;
+    name: string;
+    label: string;
 }
 
 export type ObjectiveType = {
-    name: string;
-    achievement_target: string;
-    target_date: Date;
+    name?: string;
+    achievement_target?: string;
+    target_date?: Date | null;
     risks: RiskType[];
 }
 
