@@ -1,4 +1,5 @@
 import { RiskOwnerType } from "../type";
+import { hash_tags } from "./hash_tags";
 import { risk_indicators } from "./risk_indicator";
 import { risk_severities } from "./risk_severity";
 
@@ -19,6 +20,7 @@ export const owner_risk_data: RiskOwnerType = {
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
+                    hash_tags: hash_tags
                 },
                 {
                     name: 'Risk 2 Objective 1',
@@ -28,6 +30,7 @@ export const owner_risk_data: RiskOwnerType = {
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
+                    hash_tags: hash_tags
                 },
                 {
                     name: 'Risk 3 Objective 1',
@@ -37,6 +40,7 @@ export const owner_risk_data: RiskOwnerType = {
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
+                    hash_tags: hash_tags
                 },
                 {
                     name: 'Risk 4 Objective 1',
@@ -55,6 +59,7 @@ export const owner_risk_data: RiskOwnerType = {
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
+                    hash_tags: hash_tags
                 },
             ]
         }

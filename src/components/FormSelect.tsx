@@ -1,29 +1,39 @@
-import { MenuItem, Select } from "@mui/material"
+import { MenuItem, Select, SelectProps, SxProps, Theme } from "@mui/material"
 import React from 'react';
 import Form, { FormProps } from "./Form"
 
 interface FormSelectProps extends FormProps {
-    onChange?: () => void;
-    value?: any;
     items?: {
         value: any;
         label: React.ReactNode | string;
-    }[]
+    }[],
+    sx?: SxProps<Theme>;
+    value?: string;
+    onChange?: SelectProps['onChange'];
 }
 
-const FormSelect = ({...props}: FormSelectProps) =>  {
+const FormSelect = ({
+    items,
+    label,
+    labelPosition,
+    onChange,
+    sx,
+    value
+}: FormSelectProps) =>  {
     return (
         <Form
-            {...props}
+            label={label}
+            labelPosition={labelPosition}
             formComponent={
                 <Select
                     size="small"
                     fullWidth
-                    onChange={props.onChange}
-                    value={props.value}
+                    onChange={onChange}
+                    sx={sx}
+                    value={value}
                     >
                         {
-                            props?.items?.map((item, index) => (
+                            items?.map((item, index) => (
                                 <MenuItem key={index} value={item.value}>{item.label}</MenuItem>
                             ))
                         }

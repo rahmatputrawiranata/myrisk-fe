@@ -1,4 +1,4 @@
-import { Autocomplete, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, MenuItem, Select, TextField, TextareaAutosize } from "@mui/material"
 import React from 'react';
 import Form, { FormProps } from "./Form"
 
@@ -8,21 +8,25 @@ interface FormSelectProps extends FormProps {
     items?: {
         label: string | number | readonly string[] | undefined;
         value: string | number | readonly string[] | undefined;
-    }[]
+    }[];
+    multiline?: boolean
+    multiple?: boolean
 }
 
 const FormAutoComplete = ({...props}: FormSelectProps) =>  {
     return (
         <Form
-            {...props}
+            label={props.label}
+            labelPosition={props.labelPosition}
             formComponent={
                 <Autocomplete
+                    multiple={props.multiple}
                     fullWidth
                     onChange={props.onChange}
                     options={props.items ? props.items : []}
                     size="small"
-                    renderInput={(params) => (<TextField  
-                                                {...params} />)}
+                    renderInput={(params) => props.multiline ? (<TextareaAutosize {...params} />) : (<TextField  
+                        {...params} />)}
                 />
             }
         />
