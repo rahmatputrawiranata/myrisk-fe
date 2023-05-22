@@ -10,7 +10,6 @@ const LabelComponent = ({children, color, filled = false, font_color}: {children
         labelStyle = {
             backgroundColor: color,
             color: font_color || 'white',
-            paddingX: '10px',
             paddingY: '12px',
         }
     }else{
@@ -25,13 +24,15 @@ const LabelComponent = ({children, color, filled = false, font_color}: {children
     return (
         <Box
             sx={{
-                paddingX: '8px',
                 paddingY: '10px',
+                minWidth: 'calc(100% - 20px)',
                 borderRadius: '100px',
                 fontWeight: 'bold',
                 fontSize: '12px',
                 ...labelStyle,
                 display: 'inline-block',
+                marginX: '10px',
+                textAlign: 'center'
             }}
         >
             {children}

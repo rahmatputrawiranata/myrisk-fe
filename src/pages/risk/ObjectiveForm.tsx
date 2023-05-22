@@ -24,6 +24,7 @@ import { ObjectiveType } from "./type";
 import FormDatePicker from "../../components/FormDatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import LabelComponent from "./components/LabelComponent";
+import { risk_indicators } from "./dummy/risk_indicator";
 
 interface ObjectiveFormProp {
     risk_owner?: string;
@@ -614,20 +615,10 @@ export const ObjectiveForm = ({
                                             </Grid>
                                             <Grid item xs={2} sx={{ paddingRight: "10px" }}>
                                                 <FormSelect
-                                                    items={[
-                                                        {
-                                                            value: "danger",
-                                                            label: "Danger",
-                                                        },
-                                                        {
-                                                            value: "neutral",
-                                                            label: "Neutral",
-                                                        },
-                                                        {
-                                                            value: "safe",
-                                                            label: "Safe",
-                                                        },
-                                                    ]}
+                                                    items={risk_indicators.map((item) => ({ 
+                                                        label: item.label,
+                                                        value: item.name
+                                                    }))}
                                                 />
                                             </Grid>
                                             <Grid item xs={2}>
@@ -1334,22 +1325,30 @@ export const ObjectiveForm = ({
                                 </Grid>
                                 <Grid container item xs={5}>
                                     <Grid item xs={3}>
-                                        <LabelComponent
-                                            color={risk.risk_indicator.color}
-                                            filled={false}
-                                            font_color={risk.risk_indicator.font_color}
-                                        >
-                                            {risk.risk_indicator.label}
-                                        </LabelComponent>
+                                        {
+                                            risk.risk_indicator && (
+                                                <LabelComponent
+                                                    color={risk.risk_indicator.color}
+                                                    filled={false}
+                                                    font_color={'#000'}
+                                                >
+                                                    {risk.risk_indicator.label}
+                                                </LabelComponent>
+                                            )
+                                        }
                                     </Grid>
                                     <Grid item xs={3}>
-                                        <LabelComponent
-                                            color={risk.risk_severity.color}
-                                            filled={true}
-                                            font_color={risk.risk_severity.font_color}
-                                        >
-                                            {risk.risk_severity.label}
-                                        </LabelComponent>
+                                        {
+                                            risk.risk_severity && (
+                                                <LabelComponent
+                                                    color={risk.risk_severity.color}
+                                                    filled={true}
+                                                    font_color={'#FFF'}
+                                                >
+                                                    {risk.risk_severity.label}
+                                                </LabelComponent>
+                                            )
+                                        }
                                     </Grid>
                                     <Grid item xs={3} justifyContent='center'>
                                         <Typography

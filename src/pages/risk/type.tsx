@@ -1,7 +1,7 @@
 export type RiskType = {
     name: string;
-    risk_indicator: RiskIndicatorType;
-    risk_severity: RiskSeverityType;
+    risk_indicator?: RiskIndicatorType;
+    risk_severity?: RiskSeverityType;
     treatment: string;
     treatment_percentage: number;
     status: string;
@@ -10,14 +10,12 @@ export type RiskType = {
 
 export type RiskIndicatorType = {
     color: string;
-    font_color: string;
     name: string;
     label: string;
 }
 
 export type RiskSeverityType = {
     color: string;
-    font_color: string;
     name: string;
     label: string;
 }

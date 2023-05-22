@@ -1,4 +1,6 @@
 import { RiskOwnerType } from "../type";
+import { risk_indicators } from "./risk_indicator";
+import { risk_severities } from "./risk_severity";
 
 export const owner_risk_data: RiskOwnerType = {
     risk_owner: 'Objective 1',
@@ -10,43 +12,50 @@ export const owner_risk_data: RiskOwnerType = {
             target_date: new Date(),
             risks: [
                 {
-                    name: 'Risk 1',
-                    risk_indicator: {
-                        color: '#FF0000',
-                        name: 'HIGH',
-                        label: 'High',
-                        font_color: '#FFFFFF',
-                    },
-                    risk_severity: {
-                        color: '#FF0000',
-                        font_color: '#FFFFFF',
-                        name: 'HIGH',
-                        label: 'High',
-                    },
+                    name: 'Risk 1 Objective 1',
+                    risk_indicator: risk_indicators.find((item) => item.name === 'DANGER'),
+                    risk_severity: risk_severities.find((item) => item.name === 'HIGH'),
                     treatment: 'Mitigate',
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
                 },
                 {
-                    name: 'Risk 2',
-                    risk_indicator: {
-                        color: '#FF0000',
-                        name: 'HIGH',
-                        label: 'High',
-                        font_color: '#FFFFFF',
-                    },
-                    risk_severity: {
-                        color: '#FF0000',
-                        font_color: '#FFFFFF',
-                        name: 'HIGH',
-                        label: 'High',
-                    },
+                    name: 'Risk 2 Objective 1',
+                    risk_indicator: risk_indicators.find((item) => item.name === 'NEUTRAL'),
+                    risk_severity: risk_severities.find((item) => item.name === 'MEDIUM-HIGH'),
                     treatment: 'Mitigate',
                     treatment_percentage: 50,
                     status: 'Finalized',
                     status_updated_at: new Date('2021-10-10 10:10:10'),
-                }
+                },
+                {
+                    name: 'Risk 3 Objective 1',
+                    risk_indicator: risk_indicators.find((item) => item.name === 'SAFE'),
+                    risk_severity: risk_severities.find((item) => item.name === 'MEDIUM'),
+                    treatment: 'Mitigate',
+                    treatment_percentage: 50,
+                    status: 'Finalized',
+                    status_updated_at: new Date('2021-10-10 10:10:10'),
+                },
+                {
+                    name: 'Risk 4 Objective 1',
+                    risk_indicator: risk_indicators.find((item) => item.name === 'SAFE'),
+                    risk_severity: risk_severities.find((item) => item.name === 'MEDIUM-LOW'),
+                    treatment: 'Mitigate',
+                    treatment_percentage: 50,
+                    status: 'Finalized',
+                    status_updated_at: new Date('2021-10-10 10:10:10'),
+                },
+                {
+                    name: 'Risk 4 Objective 1',
+                    risk_indicator: risk_indicators.find((item) => item.name === 'SAFE'),
+                    risk_severity: risk_severities.find((item) => item.name === 'LOW'),
+                    treatment: 'Mitigate',
+                    treatment_percentage: 50,
+                    status: 'Finalized',
+                    status_updated_at: new Date('2021-10-10 10:10:10'),
+                },
             ]
         }
     ]
